@@ -20,7 +20,12 @@ export async function getIsOnline({
     addresses.map(async (ip) => {
       try {
         updateItemLoading(ip, true)
-        await fetch(ip, { signal: AbortSignal.timeout(5000), mode: 'no-cors' })
+        const hasNoCors = !ip.endsWith('7000')
+        const options = {
+          signal: AbortSignal.timeout(5000),
+          mode: hasNoCors ? 'no-cors' : 'cors',
+        } as RequestInit
+        await fetch(ip, options)
         updateItemStatus(ip, true)
 
         return true
