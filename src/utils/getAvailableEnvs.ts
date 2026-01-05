@@ -1,6 +1,6 @@
-import { Data } from '../providers/UserDataProvider'
+import { IResponse } from '../interfaces/IResponse'
 
-export function getAvailableEnvs(data: Data): string[] {
+export function getAvailableEnvs(data: IResponse): string[] {
   const envs: string[] = []
   for (const user in data) {
     for (const env in data[user]) {
