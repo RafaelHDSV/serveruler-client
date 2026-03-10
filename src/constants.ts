@@ -12,4 +12,4 @@ export const SERVER_OPTIONS: Array<IServerOption> = [
   { label: 'Auto X', value: '4010' },
 ]
 
-export const COMPANY_DAYS = [0, 1, 3, 5, 6]
+export const COMPANY_DAYS = [0, 1, 2, 3, 4, 5, 6]
