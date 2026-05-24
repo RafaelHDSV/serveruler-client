@@ -168,12 +168,10 @@ export const UserCard = memo(function UserCard({ address, user }: IUserProps) {
 })
 
 const USERNAMES: Record<string, string> = {
-  joao: 'joaolfern',
   carlos: 'JoaoCarlosP',
   vieira: 'RafaelHDSV',
   fernanda: 'mfernandanll',
   bruno: 'BrunoPasqual',
-  lucas: 'lucasrbordignon',
   tobias: 'tobiasperassi',
   zarco: 'felipezarco',
   danieli: 'Danieli01',
