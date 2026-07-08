@@ -11,6 +11,7 @@ import {
 } from '@mui/material'
 import { memo, useCallback, useEffect, useMemo, useState } from 'react'
 import { SERVER_OPTIONS } from '../../../../constants'
+import { useUserData } from '../../../../hooks/useIps'
 import { copyToClipboard } from '../../../../utils/copyToClipboard'
 import { getCompleteAddress } from '../../../../utils/getCompleteAddress'
 import { getIsOnline } from '../../../../utils/getIsOnline'
@@ -22,6 +23,7 @@ interface IUserProps {
 }
 
 export const UserCard = memo(function UserCard({ address, user }: IUserProps) {
+  const { usernames } = useUserData()
   const [status, setStatus] = useState<Record<string, boolean>>({})
   const [isLoading, setIsLoading] = useState<Record<string, boolean>>({})
   const [chipVariants, setChipVariants] = useState<
@@ -99,8 +101,11 @@ export const UserCard = memo(function UserCard({ address, user }: IUserProps) {
     return result
   }, [status])
 
-  const username = USERNAMES[user]
-  const profileImage = username && `https://github.com/${username}.png`
+  const username = usernames[user]
+  const profileImage = username
+    ? `https://github.com/${username}.png`
+    : undefined
+  const avatarFallback = user.slice(0, 2).toUpperCase()
 
   return (
     <>
@@ -126,7 +131,9 @@ export const UserCard = memo(function UserCard({ address, user }: IUserProps) {
             }}
           >
             <Stack direction='row' spacing={1} alignItems='center'>
-              <Avatar src={profileImage} sx={{ width: 24, height: 24 }} />
+              <Avatar src={profileImage} sx={{ width: 24, height: 24 }}>
+                {!profileImage && avatarFallback}
+              </Avatar>
               <Typography>{user}</Typography>
             </Stack>
             <Typography
@@ -166,23 +173,3 @@ export const UserCard = memo(function UserCard({ address, user }: IUserProps) {
     </>
   )
 })
-
-const USERNAMES: Record<string, string> = {
-  carlos: 'JoaoCarlosP',
-  vieira: 'RafaelHDSV',
-  fernanda: 'mfernandanll',
-  tobias: 'tobiasperassi',
-  zarco: 'felipezarco',
-  davi: 'DaviSanttos',
-  marcus: 'marcuslaraa',
-  robson: 'RobsonArita',
-  diego: 'odiegoalessandro',
-  janderson: 'JandersonSR',
-  nicolas: 'Nicolaskn95',
-  thales: 'thalesmanoel',
-  ana: 'anamrcnds',
-  andre: 'AndreLuizJPoles',
-  vinicius: 'ViniciusRibeiro6',
-  gustavo: 'cardosoGu',
-  hugo: 'meirelleshugo',
-}

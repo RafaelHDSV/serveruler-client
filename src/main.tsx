@@ -6,6 +6,6 @@ import App from './App.tsx'
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <App />
-    <VieiraAnalytics projectKey="serveruler-client" />
+    <VieiraAnalytics projectKey='serveruler-client' />
   </React.StrictMode>
 )

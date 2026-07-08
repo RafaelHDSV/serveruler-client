@@ -6,16 +6,21 @@ import { UserDataContext } from '../contexts/UserDataContext'
 
 export function UserDataProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<IResponse>({})
+  const [usernames, setUsernames] = useState<Record<string, string>>({})
   const [envOptions, setEnvOptions] = useState<string[]>([])
   const [selectedEnv, setSelectedEnv] = useState<string>('')
 
   useEffect(() => {
     async function updateData() {
-      const data = await fetchData()
+      const [data, usernames] = await Promise.all([
+        fetchData(),
+        fetchUsernames(),
+      ])
       const sortedData = Object.fromEntries(
         Object.entries(data).sort((a, b) => a[0].localeCompare(b[0]))
       ) as IResponse
       setData(sortedData)
+      setUsernames(usernames)
     }
 
     updateData()
@@ -41,6 +46,7 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
     <UserDataContext.Provider
       value={{
         data,
+        usernames,
         envOptions,
         selectedEnv,
         setSelectedEnv,
@@ -55,4 +61,10 @@ async function fetchData() {
   const response = await fetch('data.json')
   const data = await response.json()
   return data
+}
+
+async function fetchUsernames() {
+  const response = await fetch('usernames.json')
+  const usernames = await response.json()
+  return usernames as Record<string, string>
 }
