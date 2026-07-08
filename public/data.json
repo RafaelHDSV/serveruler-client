@@ -42,11 +42,6 @@
     "casa": "172.24.0.191",
     "externalEmpresa": "172.24.0.175"
   },
-  "mateus": {
-    "externalEmpresa": "172.24.0.176",
-    "empresa": "10.10.0.219",
-    "casa": "172.24.59.128"
-  },
   "nicolas": {
     "empresa": "10.10.0.50",
     "casa": "172.24.0.199"
