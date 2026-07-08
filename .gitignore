@@ -32,3 +32,5 @@ database/*
 .eslintcache
 .cursor
 .issues
+public/data.json
+public/usernames.json
