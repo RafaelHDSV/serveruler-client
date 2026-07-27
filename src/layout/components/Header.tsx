@@ -9,7 +9,7 @@ import { SelectEnv } from './SelectEnv'
 
 export function Header() {
   function handleOpenGithub() {
-    window.open('https://github.com/joaolfern/serveruler-client', '_blank')
+    window.open('https://github.com/AGX-Software/ips', '_blank')
   }
 
   return (
