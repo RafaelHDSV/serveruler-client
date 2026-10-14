@@ -13,6 +13,7 @@ const IPS_REPO = process.env.IPS_REPO
 const GITHUB_ORG = process.env.GITHUB_ORG
 const REPO_URL = process.env.REPO_URL
 const MATCH_THRESHOLD = 70
+const SUPPORT_TEAMS = ['suporte-produto', 'support-analyst']
 
 const execAsync = (command) =>
   new Promise((resolve, reject) => {
@@ -121,6 +122,39 @@ async function fetchOrgMembers() {
   return members
 }
 
+async function fetchTeamsByLogin() {
+  const slugsStdout = await execAsync(
+    `gh api orgs/${GITHUB_ORG}/teams --paginate --jq ".[].slug"`
+  )
+  const slugs = slugsStdout
+    .split('\n')
+    .map((s) => s.trim())
+    .filter(Boolean)
+
+  const teamsByLogin = new Map()
+  for (const slug of slugs) {
+    const membersStdout = await execAsync(
+      `gh api orgs/${GITHUB_ORG}/teams/${slug}/members --paginate --jq ".[].login"`
+    )
+    for (const login of membersStdout.split('\n').map((l) => l.trim())) {
+      if (!login) continue
+      if (!teamsByLogin.has(login)) teamsByLogin.set(login, new Set())
+      teamsByLogin.get(login).add(slug)
+    }
+  }
+
+  return teamsByLogin
+}
+
+// Admins sit in every team, support included — only drop support-only members.
+function isSupportOnly(login, teamsByLogin) {
+  const teams = [...(teamsByLogin.get(login) ?? [])]
+  return (
+    teams.some((team) => SUPPORT_TEAMS.includes(team)) &&
+    teams.every((team) => SUPPORT_TEAMS.includes(team))
+  )
+}
+
 function getNameTokens(name) {
   return name.split(/\s+/).map(normalize).filter(Boolean)
 }
@@ -141,25 +175,56 @@ function scoreMember(personKey, member) {
   return 0
 }
 
-function matchPersonToMember(personKey, members) {
-  const scored = members
+function rankCandidates(personKey, members) {
+  return members
     .map((member) => ({
       member,
       score: scoreMember(personKey, member),
     }))
     .filter(({ score }) => score >= MATCH_THRESHOLD)
     .sort((a, b) => b.score - a.score)
+}
 
-  if (scored.length === 0) return null
+function isAmbiguous(scored) {
+  return scored.length > 1 && scored[0].score === scored[1].score
+}
 
-  if (scored.length > 1 && scored[0].score === scored[1].score) {
-    console.warn(
-      `Match ambíguo para "${personKey}": ${scored[0].member.login} e ${scored[1].member.login} — excluído`
-    )
-    return null
+// Common first names ("lucas") tie until nicknames ("ruivo", "luka") claim
+// their logins, so resolve in passes and drop claimed logins between them.
+function matchPeopleToMembers(personKeys, members) {
+  const matches = new Map()
+  const claimedLogins = new Set()
+  let pending = [...personKeys]
+  let progressed = true
+
+  while (pending.length > 0 && progressed) {
+    progressed = false
+    const available = members.filter((m) => !claimedLogins.has(m.login))
+
+    for (const personKey of pending) {
+      const scored = rankCandidates(personKey, available)
+      if (scored.length === 0 || isAmbiguous(scored)) continue
+
+      matches.set(personKey, scored[0].member)
+      claimedLogins.add(scored[0].member.login)
+      progressed = true
+      break
+    }
+
+    pending = pending.filter((key) => !matches.has(key))
   }
 
-  return scored[0].member
+  const available = members.filter((m) => !claimedLogins.has(m.login))
+  for (const personKey of pending) {
+    const scored = rankCandidates(personKey, available)
+    if (isAmbiguous(scored)) {
+      console.warn(
+        `Match ambíguo para "${personKey}": ${scored[0].member.login} e ${scored[1].member.login} — excluído`
+      )
+    }
+  }
+
+  return matches
 }
 
 function sortKeys(obj) {
@@ -177,14 +242,21 @@ async function writeJson(filePath, content) {
 async function main() {
   const tableText = await fetchTableText()
   const allIPs = parseTableTs(tableText)
-  const members = await fetchOrgMembers()
+  const [orgMembers, teamsByLogin] = await Promise.all([
+    fetchOrgMembers(),
+    fetchTeamsByLogin(),
+  ])
+  const members = orgMembers.filter(
+    (member) => !isSupportOnly(member.login, teamsByLogin)
+  )
+  const matches = matchPeopleToMembers(Object.keys(allIPs), members)
 
   const data = {}
   const usernames = {}
   const noMatch = []
 
   for (const personKey of Object.keys(allIPs)) {
-    const match = matchPersonToMember(personKey, members)
+    const match = matches.get(personKey)
 
     if (!match) {
       noMatch.push(personKey)
