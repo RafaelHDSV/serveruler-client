@@ -1,99 +1,35 @@
-# Local Network IP Inspector
+<p align="center">
+  <strong>Serveruler Client</strong>
+</p>
 
-This project is a local network IP inspector that helps you manage and monitor IP addresses and services within your local network.
+<p align="center">
+  <strong>IPs e serviços da rede local, num painel só.</strong><br />
+  Status online, copiar endereço, abrir no browser — com sync da tabela AGX quando houver.
+</p>
 
-## Table of Contents
+---
 
-- [Introduction](#introduction)
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Scripts](#scripts)
-- [Configuration](#configuration)
-- [Contributing](#contributing)
-- [License](#license)
+## Por que existe
 
-## Introduction
+Em escritório e em casa os IPs mudam e os serviços se espalham. Abrir planilha ou caçar `.env` não escala. O Serveruler Client mostra a lista útil, diz se está no ar e encurta o caminho até o serviço.
 
-The Local Network IP Inspector provides a user-friendly interface to view and manage IP addresses and services in your local network. It includes features such as checking the status of services, copying IP addresses to the clipboard, and opening IP addresses in a new window.
+## O que você ganha
 
-## Features
+| | |
+|---|---|
+| **Lista clara** | Serviços, IPs e portas |
+| **Status** | Checagem online |
+| **Atalhos** | Copiar IP ou abrir no navegador |
+| **Sync AGX** | Atualiza a partir do repo `ips` no startup |
 
-- View a list of services and their corresponding IP addresses and ports.
-- Check the online status of services.
-- Copy IP addresses to the clipboard.
-- Open IP addresses in a new browser window.
-- Automatic IP sync from the AGX `ips` repository on startup.
-- GitHub avatars for active AGX org members.
+## Para quem é
 
-## Installation
+Devs AGX (e forks) que trabalham com vários serviços na LAN.
 
-1. Clone the repository:
+Companion: [`serveruler-redirect`](https://github.com/RafaelHDSV/serveruler-redirect) escolhe empresa vs casa pelo dia da semana.
 
-   ```sh
-   git clone git@github.com:joaolfern/serveruler-client.git
-   cd serveruler-client
-   ```
+## Começar
 
-2. Install dependencies:
+Install e scripts: [`docs/ambiente-e-operacao.md`](docs/ambiente-e-operacao.md). Contexto: [`docs/context.md`](docs/context.md).
 
-   ```sh
-   yarn
-   ```
-
-3. Install and authenticate [GitHub CLI](https://cli.github.com/):
-
-   ```sh
-   gh auth login
-   ```
-
-4. Copy environment variables (optional — defaults work for AGX):
-
-   ```sh
-   cp .env.example .env
-   ```
-
-## Usage
-
-1. Run `yarn ip` to sync IPs and GitHub usernames from the remote repository.
-
-2. Create an optimized build with `yarn build`
-
-3. Access Serveruler at `http://localhost:5173`.
-
-### Windows startup automation
-
-The `serveruler-start.bat` in Windows Startup runs `yarn ip` before `yarn dev` on every boot, keeping IPs and avatars up to date automatically.
-
-**Prerequisite:** `gh` must be authenticated (`gh auth status`) with access to the `AGX-Software` org and the `ips` repository.
-
-## Scripts
-
-- `yarn dev`: Starts the development server.
-- `yarn build`: Builds the project for production.
-- `yarn ip`: Syncs IPs from `AGX-Software/ips` and generates `public/usernames.json` from active AGX GitHub org members.
-
-## Configuration
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `IPS_REPO` | `AGX-Software/ips` | GitHub repo path for `table.ts` |
-| `GITHUB_ORG` | `AGX-Software` | Org used to filter active members and map avatars |
-| `REPO_URL` | `git@github.com:AGX-Software/ips.git` | Git fallback URL for `yarn ip` when `gh api` is unavailable |
-
-### How IP sync works
-
-1. Fetches `table.ts` via `gh api` (primary) or `git clone/pull` (fallback).
-2. Parses the IP object with a brace-counting parser.
-3. Lists members of the `AGX-Software` GitHub org.
-4. Matches each person in `table.ts` to an org member by login/name scoring.
-5. Writes `public/data.json` (IPs) and `public/usernames.json` (GitHub logins).
-6. People not in the org (e.g. former members) are excluded automatically.
-
-## Contributing
-
-Contributions are welcome!
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+Contribuição: [`CONTRIBUTING.md`](CONTRIBUTING.md) · conduta: [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) · mudanças: [`CHANGELOG.md`](CHANGELOG.md).
