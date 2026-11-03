@@ -21,15 +21,34 @@ Em escritório e em casa os IPs mudam e os serviços se espalham. Abrir planilha
 | **Status** | Checagem online |
 | **Atalhos** | Copiar IP ou abrir no navegador |
 | **Sync AGX** | Atualiza a partir do repo `ips` no startup |
+| **Avatares** | Membros ativos da org AGX |
 
-## Para quem é
+## Como funciona
 
-Devs AGX (e forks) que trabalham com vários serviços na LAN.
+```text
+Startup  →  sync opcional da tabela ips
+    ↓
+UI Vite/React  →  ping / status  →  copiar ou abrir URL
+```
 
-Companion: [`serveruler-redirect`](https://github.com/RafaelHDSV/serveruler-redirect) escolhe empresa vs casa pelo dia da semana.
+Companion: [`serveruler-redirect`](https://github.com/RafaelHDSV/serveruler-redirect) escolhe empresa vs casa pelo dia da semana. IPs nos arquivos podem ser atualizados por [`sync-local-ip`](https://github.com/RafaelHDSV/sync-local-ip).
+
+## Posicionamento
+
+| Serveruler é | Serveruler não é |
+|---|---|
+| Painel de LAN | Cloud inventory |
+| Atalho para o serviço | Alterar a placa de rede |
+| Cliente Vite | O redirect por dia da semana |
+
+## Stack (em uma linha)
+
+Vite + React (porta típica 5173) · sync com repo `ips`.
+
+Detalhes: [`docs/context.md`](docs/context.md) · especificação: [`docs/especificacao.md`](docs/especificacao.md).
 
 ## Começar
 
-Install e scripts: [`docs/ambiente-e-operacao.md`](docs/ambiente-e-operacao.md). Contexto: [`docs/context.md`](docs/context.md).
+Install e scripts: [`docs/ambiente-e-operacao.md`](docs/ambiente-e-operacao.md).
 
 Contribuição: [`CONTRIBUTING.md`](CONTRIBUTING.md) · conduta: [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) · mudanças: [`CHANGELOG.md`](CHANGELOG.md).
